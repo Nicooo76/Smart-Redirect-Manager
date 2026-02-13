@@ -119,6 +119,14 @@ class SRM_URL_Monitor {
 			return;
 		}
 
+		// Cache leeren, damit get_permalink die alte URL aus der DB liest (nicht bereits
+		// aktualisierte Daten aus dem Objekt-Cache, z. B. bei REST/Block-Editor).
+		clean_post_cache( $post_id );
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return;
+		}
+
 		self::$old_permalinks[ $post_id ] = get_permalink( $post_id );
 	}
 
@@ -190,7 +198,12 @@ class SRM_URL_Monitor {
 
 		self::update_redirect_chains( $old_normalized, $new_normalized );
 
+		// Hinweis-Transient: aktueller User oder Post-Autor (REST/Block-Editor liefert evtl. keinen User).
 		$user_id = get_current_user_id();
+		if ( ! $user_id ) {
+			$post = get_post( $post_id );
+			$user_id = $post ? (int) $post->post_author : 0;
+		}
 		if ( $user_id ) {
 			set_transient( 'srm_redirect_created_' . $user_id, array(
 				'source_url'  => $old_normalized,
@@ -198,7 +211,7 @@ class SRM_URL_Monitor {
 				'status_code' => $status_code,
 				'type'        => 'post',
 				'post_id'     => $post_id,
-			), 60 );
+			), 120 );
 		}
 	}
 
@@ -283,7 +296,7 @@ class SRM_URL_Monitor {
 				'status_code' => $status_code,
 				'type'        => 'term',
 				'term_id'     => $term_id,
-			), 60 );
+			), 120 );
 		}
 	}
 

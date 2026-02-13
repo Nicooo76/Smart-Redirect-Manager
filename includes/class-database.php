@@ -524,10 +524,18 @@ class SRM_Database {
 
         $table = self::get_table_name( 'redirects' );
 
-        // Sanitize incoming data.
+        // Sanitize incoming data. target_url: Pfade (/) mit normalize_url, absolute URLs mit esc_url_raw.
+        $target_raw = isset( $data['target_url'] ) ? trim( (string) $data['target_url'] ) : '';
+        $target_url = '';
+        if ( '' !== $target_raw ) {
+            $target_url = ( 0 === strpos( $target_raw, '/' ) )
+                ? self::normalize_url( $target_raw )
+                : esc_url_raw( $target_raw );
+        }
+
         $row = array(
             'source_url'  => isset( $data['source_url'] )  ? self::normalize_url( $data['source_url'] ) : '',
-            'target_url'  => isset( $data['target_url'] )  ? esc_url_raw( $data['target_url'] ) : '',
+            'target_url'  => $target_url,
             'status_code' => isset( $data['status_code'] )  ? absint( $data['status_code'] ) : 301,
             'is_regex'    => isset( $data['is_regex'] )     ? ( $data['is_regex'] ? 1 : 0 ) : 0,
             'is_active'   => isset( $data['is_active'] )    ? ( $data['is_active'] ? 1 : 0 ) : 1,
@@ -539,7 +547,7 @@ class SRM_Database {
         );
 
         // Validate required fields.
-        if ( empty( $row['source_url'] ) ) {
+        if ( empty( $row['source_url'] ) || empty( $row['target_url'] ) ) {
             return false;
         }
 
