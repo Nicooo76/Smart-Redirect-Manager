@@ -153,8 +153,14 @@ class SRM_Admin_Settings {
 						<td>
 							<fieldset>
 								<?php
-								$post_types          = get_post_types( array( 'public' => true ), 'objects' );
-								$monitored           = isset( $settings['monitor_post_types'] ) ? (array) $settings['monitor_post_types'] : array();
+								// Alle öffentlich abrufbaren Post-Typen (Beiträge, Seiten, Custom Post Types).
+								$post_types = array();
+								foreach ( get_post_types( array(), 'objects' ) as $pt ) {
+									if ( ! empty( $pt->public ) || ! empty( $pt->publicly_queryable ) ) {
+										$post_types[ $pt->name ] = $pt;
+									}
+								}
+								$monitored = isset( $settings['monitor_post_types'] ) ? (array) $settings['monitor_post_types'] : array();
 
 								foreach ( $post_types as $post_type ) :
 									$checked = in_array( $post_type->name, $monitored, true );
@@ -169,9 +175,9 @@ class SRM_Admin_Settings {
 								<?php endforeach; ?>
 							</fieldset>
 							<p class="description">
-								W&auml;hlen Sie die Inhaltstypen aus, deren URL-&Auml;nderungen &uuml;berwacht werden sollen.
-								F&uuml;r jeden ausgew&auml;hlten Typ wird bei einer Permalink-&Auml;nderung automatisch ein
-								Redirect erstellt.
+								W&auml;hlen Sie die Inhaltstypen aus, deren URL-&Auml;nderungen &uuml;berwacht werden sollen
+								(Beitr&auml;ge, Seiten und Custom Post Types). F&uuml;r jeden ausgew&auml;hlten Typ wird
+								bei einer Permalink-&Auml;nderung automatisch ein Redirect erstellt.
 							</p>
 						</td>
 					</tr>
