@@ -38,27 +38,65 @@ class SRM_URL_Monitor {
 	private static $old_term_links = array();
 
 	/**
+	 * Default settings for URL monitoring (used when option keys are missing).
+	 *
+	 * @var array
+	 */
+	private static $defaults = array(
+		'auto_redirect'      => true,
+		'monitor_post_types' => array( 'post', 'page' ),
+		'default_status_code' => 301,
+	);
+
+	/**
 	 * Initialize hooks for URL monitoring.
 	 *
 	 * @return void
 	 */
 	public static function init() {
+		add_filter( 'wp_insert_post_data', array( __CLASS__, 'store_old_permalink_before_save' ), 10, 2 );
 		add_action( 'pre_post_update', array( __CLASS__, 'store_old_permalink' ), 10, 2 );
 		add_action( 'post_updated', array( __CLASS__, 'check_permalink_change' ), 10, 3 );
+		add_action( 'wp_after_insert_post', array( __CLASS__, 'check_permalink_change_after_insert' ), 10, 3 );
 		add_action( 'pre_edit_term', array( __CLASS__, 'store_old_term_link' ), 10, 2 );
 		add_action( 'edited_term', array( __CLASS__, 'check_term_link_change' ), 10, 3 );
 		add_action( 'admin_notices', array( __CLASS__, 'show_redirect_notice' ) );
 	}
 
 	/**
+	 * Get settings merged with defaults so URL monitoring works even when option keys are missing.
+	 *
+	 * @return array
+	 */
+	private static function get_settings() {
+		return wp_parse_args( get_option( 'srm_settings', array() ), self::$defaults );
+	}
+
+	/**
+	 * Store the old permalink when post data is about to be saved (runs on wp_insert_post_data).
+	 * Fallback for Block Editor / REST API where pre_post_update may not run in time.
+	 *
+	 * @param array $data    New post data.
+	 * @param array $postarr Raw post data including ID on update.
+	 * @return array Unchanged $data.
+	 */
+	public static function store_old_permalink_before_save( $data, $postarr ) {
+		if ( empty( $postarr['ID'] ) ) {
+			return $data;
+		}
+		self::store_old_permalink( (int) $postarr['ID'], $data );
+		return $data;
+	}
+
+	/**
 	 * Store the old permalink before a post is updated.
 	 *
 	 * @param int   $post_id Post ID about to be updated.
-	 * @param array $data    Array of unslashed post data.
+	 * @param array $data    Array of unslashed post data (optional, not used for storage).
 	 * @return void
 	 */
 	public static function store_old_permalink( $post_id, $data ) {
-		$settings = get_option( 'srm_settings', array() );
+		$settings = self::get_settings();
 
 		// Skip if auto-redirect is disabled.
 		if ( empty( $settings['auto_redirect'] ) ) {
@@ -76,9 +114,7 @@ class SRM_URL_Monitor {
 			return;
 		}
 
-		// Check if the post type is monitored.
 		$monitor_post_types = isset( $settings['monitor_post_types'] ) ? (array) $settings['monitor_post_types'] : array();
-
 		if ( ! in_array( $post->post_type, $monitor_post_types, true ) ) {
 			return;
 		}
@@ -95,6 +131,31 @@ class SRM_URL_Monitor {
 	 * @return void
 	 */
 	public static function check_permalink_change( $post_id, $post_after, $post_before ) {
+		self::maybe_create_redirect_for_post( $post_id );
+	}
+
+	/**
+	 * Fallback: run redirect creation after insert (for Block Editor / REST API).
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post    Post object after save.
+	 * @param bool    $update  Whether this is an update.
+	 * @return void
+	 */
+	public static function check_permalink_change_after_insert( $post_id, $post, $update ) {
+		if ( ! $update ) {
+			return;
+		}
+		self::maybe_create_redirect_for_post( $post_id );
+	}
+
+	/**
+	 * If we stored an old permalink for this post and the URL changed, create redirect and show notice.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return void
+	 */
+	private static function maybe_create_redirect_for_post( $post_id ) {
 		if ( ! isset( self::$old_permalinks[ $post_id ] ) ) {
 			return;
 		}
@@ -105,18 +166,16 @@ class SRM_URL_Monitor {
 		$old_normalized = SRM_Database::normalize_url( $old_permalink );
 		$new_normalized = SRM_Database::normalize_url( $new_permalink );
 
-		// Clean up stored value.
 		unset( self::$old_permalinks[ $post_id ] );
 
 		if ( $old_normalized === $new_normalized ) {
 			return;
 		}
 
-		$settings   = get_option( 'srm_settings', array() );
+		$settings    = self::get_settings();
 		$status_code = isset( $settings['default_status_code'] ) ? (int) $settings['default_status_code'] : 301;
 
-		// Create the redirect from old URL to new URL.
-		SRM_Database::save_redirect( array(
+		$redirect_id = SRM_Database::save_redirect( array(
 			'source_url'  => $old_normalized,
 			'target_url'  => $new_normalized,
 			'status_code' => $status_code,
@@ -125,12 +184,13 @@ class SRM_URL_Monitor {
 			'is_active'   => 1,
 		) );
 
-		// Chain resolution: update existing redirects that point to the old URL.
+		if ( ! $redirect_id ) {
+			return;
+		}
+
 		self::update_redirect_chains( $old_normalized, $new_normalized );
 
-		// Set transient so we can show an admin notice.
 		$user_id = get_current_user_id();
-
 		if ( $user_id ) {
 			set_transient( 'srm_redirect_created_' . $user_id, array(
 				'source_url'  => $old_normalized,
@@ -150,7 +210,7 @@ class SRM_URL_Monitor {
 	 * @return void
 	 */
 	public static function store_old_term_link( $term_id, $taxonomy ) {
-		$settings = get_option( 'srm_settings', array() );
+		$settings = self::get_settings();
 
 		// Skip if auto-redirect is disabled.
 		if ( empty( $settings['auto_redirect'] ) ) {
@@ -197,11 +257,10 @@ class SRM_URL_Monitor {
 			return;
 		}
 
-		$settings    = get_option( 'srm_settings', array() );
+		$settings    = self::get_settings();
 		$status_code = isset( $settings['default_status_code'] ) ? (int) $settings['default_status_code'] : 301;
 
-		// Create the redirect from old URL to new URL.
-		SRM_Database::save_redirect( array(
+		$redirect_id = SRM_Database::save_redirect( array(
 			'source_url'  => $old_normalized,
 			'target_url'  => $new_normalized,
 			'status_code' => $status_code,
@@ -210,12 +269,13 @@ class SRM_URL_Monitor {
 			'is_active'   => 1,
 		) );
 
-		// Chain resolution: update existing redirects that point to the old URL.
+		if ( ! $redirect_id ) {
+			return;
+		}
+
 		self::update_redirect_chains( $old_normalized, $new_normalized );
 
-		// Set transient so we can show an admin notice.
 		$user_id = get_current_user_id();
-
 		if ( $user_id ) {
 			set_transient( 'srm_redirect_created_' . $user_id, array(
 				'source_url'  => $old_normalized,
@@ -238,7 +298,7 @@ class SRM_URL_Monitor {
 	private static function update_redirect_chains( $old_url, $new_url ) {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'srm_redirects';
+		$table = SRM_Database::get_table_name( 'redirects' );
 
 		$wpdb->update(
 			$table,
@@ -258,22 +318,21 @@ class SRM_URL_Monitor {
 		$user_id   = get_current_user_id();
 		$transient = get_transient( 'srm_redirect_created_' . $user_id );
 
-		if ( empty( $transient ) ) {
+		if ( empty( $transient ) || empty( $transient['source_url'] ) || empty( $transient['target_url'] ) ) {
 			return;
 		}
 
-		// Delete the transient so the notice is only shown once.
 		delete_transient( 'srm_redirect_created_' . $user_id );
 
 		$source = esc_html( $transient['source_url'] );
 		$target = esc_html( $transient['target_url'] );
-		$code   = (int) $transient['status_code'];
+		$code   = isset( $transient['status_code'] ) ? (int) $transient['status_code'] : 301;
 
 		printf(
-			'<div class="notice notice-info is-dismissible"><p>%s</p></div>',
+			'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
 			sprintf(
 				/* translators: 1: HTTP status code, 2: old URL, 3: new URL */
-				esc_html__( 'Smart Redirect Manager: A %1$d redirect was automatically created from %2$s to %3$s.', 'smart-redirect-manager' ),
+				esc_html__( 'Smart Redirect Manager: Es wurde automatisch eine %1$d-Weiterleitung von %2$s nach %3$s eingerichtet.', 'smart-redirect-manager' ),
 				$code,
 				'<code>' . $source . '</code>',
 				'<code>' . $target . '</code>'
