@@ -5,6 +5,9 @@
  * Manages redirect groups/tags for organizing redirects.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

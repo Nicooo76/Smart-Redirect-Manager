@@ -6,6 +6,9 @@
  * WordPress admin area. All user-facing text is in German.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  * @since   1.0.0
  */
 

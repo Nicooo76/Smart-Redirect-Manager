@@ -5,6 +5,9 @@
  * Hit tracking and dashboard data for redirects.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

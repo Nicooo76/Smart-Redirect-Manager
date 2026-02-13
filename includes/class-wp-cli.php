@@ -6,6 +6,9 @@
  * statistics, import/export, chain detection, and cleanup utilities.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  * @since   1.0.0
  */
 

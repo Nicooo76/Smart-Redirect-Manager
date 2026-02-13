@@ -7,6 +7,9 @@
  * auf Smart Redirect Manager.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  * @since   1.0.0
  */
 

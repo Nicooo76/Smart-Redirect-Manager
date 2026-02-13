@@ -6,6 +6,9 @@
  * pagination, and redirect creation modal.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

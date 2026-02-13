@@ -6,6 +6,9 @@
  * before allowing a redirect to execute.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

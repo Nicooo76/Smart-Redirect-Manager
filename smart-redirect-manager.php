@@ -1,14 +1,17 @@
 <?php
 /**
  * Plugin Name: Smart Redirect Manager
+ * Plugin URI:  https://gauditz.com
  * Description: Automatische URL-Überwachung mit Redirects, 404-Logging, Conditional Redirects, Hit-Tracking, WP-CLI und vielem mehr.
- * Version: 1.0.0
- * Author: Smart Redirect Manager
+ * Version:     1.0.0
+ * Author:      Sven Gauditz
+ * Author URI:  https://gauditz.com
+ * License:     MIT
+ * License URI: https://opensource.org/licenses/MIT
  * Text Domain: smart-redirect-manager
  * Domain Path: /languages
  * Requires at least: 5.0
  * Requires PHP: 7.4
- * License: GPL v2 or later
  */
 
 if (!defined('ABSPATH')) {

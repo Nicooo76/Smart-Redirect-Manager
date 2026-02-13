@@ -6,6 +6,9 @@
  * all AJAX handlers consumed by the admin JavaScript.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  * @since   1.0.0
  */
 
@@ -28,6 +31,7 @@ class SRM_Admin {
     public static function init() {
         add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
         add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
+        add_action( 'admin_footer', array( __CLASS__, 'render_powered_by' ) );
 
         // AJAX handlers.
         add_action( 'wp_ajax_srm_save_redirect', array( __CLASS__, 'ajax_save_redirect' ) );
@@ -177,6 +181,31 @@ class SRM_Admin {
                 'resolved'           => __( 'Als gelöst markiert.', 'smart-redirect-manager' ),
             ),
         ) );
+    }
+
+    // -------------------------------------------------------------------------
+    // Powered by (Footer Branding)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Output "Powered by Sven Gauditz" link in admin footer on plugin pages.
+     *
+     * @return void
+     */
+    public static function render_powered_by() {
+        $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+        if ( ! $screen || strpos( $screen->id, 'srm-' ) === false ) {
+            return;
+        }
+        $url = 'https://gauditz.com';
+        ?>
+        <div class="srm-powered-by" id="srm-powered-by">
+            <a href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener noreferrer" class="srm-powered-by__link">
+                <span class="srm-powered-by__text">Powered by</span>
+                <span class="srm-powered-by__name">Sven Gauditz</span>
+            </a>
+        </div>
+        <?php
     }
 
     // -------------------------------------------------------------------------

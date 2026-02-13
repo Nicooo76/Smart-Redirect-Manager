@@ -5,6 +5,9 @@
  * WordPress-Dashboard-Widget fuer Smart Redirect Manager.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

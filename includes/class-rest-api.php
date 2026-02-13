@@ -6,6 +6,9 @@
  * and 404 log entries under the srm/v1 namespace.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  * @since   1.0.0
  */
 

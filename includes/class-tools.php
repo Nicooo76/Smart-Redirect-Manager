@@ -6,6 +6,9 @@
  * target URL validation, and server configuration export utilities.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  * @since   1.0.0
  */
 

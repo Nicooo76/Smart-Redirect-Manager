@@ -5,6 +5,9 @@
  * 404 management, regex testing, conditions, and bulk actions.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  */
 jQuery(document).ready(function ($) {
 

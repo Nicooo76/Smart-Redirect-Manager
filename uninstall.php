@@ -6,6 +6,9 @@
  * including database tables, options, transients, and cron hooks.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  */
 
 // Exit if not called by WordPress during uninstall.

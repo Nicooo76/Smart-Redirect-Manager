@@ -5,6 +5,9 @@
  * Email digest and 404-spike alerts for Smart Redirect Manager.
  *
  * @package SmartRedirectManager
+ * @author  Sven Gauditz
+ * @link    https://gauditz.com
+ * @license MIT
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
