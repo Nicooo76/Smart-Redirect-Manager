@@ -374,24 +374,26 @@ class SRM_Migration {
 			$hits_table = SRM_Database::get_table_name( 'redirect_hits' );
 
 			// Aggregate hits per redirect per day.
+			// Redirection plugin uses "redirection_id" in redirection_logs (FK to redirection_items.id).
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$hit_rows = $wpdb->get_results(
-				"SELECT redirect_id, DATE(created) AS hit_date, COUNT(*) AS hits
+				"SELECT redirection_id, DATE(created) AS hit_date, COUNT(*) AS hits
 				FROM {$logs_table}
-				GROUP BY redirect_id, DATE(created)"
+				GROUP BY redirection_id, DATE(created)"
 			);
 
 			if ( $hit_rows ) {
 				foreach ( $hit_rows as $row ) {
 
-					// Map the old redirect ID to the new SRM redirect ID.
-					if ( ! isset( $id_map[ $row->redirect_id ] ) ) {
+					// Map the old Redirection item ID to the new SRM redirect ID.
+					$old_id = isset( $row->redirection_id ) ? (int) $row->redirection_id : 0;
+					if ( ! $old_id || ! isset( $id_map[ $old_id ] ) ) {
 						// No matching redirect was imported; skip this
 						// hit-stat entry.
 						continue;
 					}
 
-					$new_redirect_id = $id_map[ $row->redirect_id ];
+					$new_redirect_id = $id_map[ $old_id ];
 
 					// Insert or update (ON DUPLICATE KEY) to handle
 					// potential overlap with existing data.

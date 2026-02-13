@@ -494,7 +494,7 @@
 }
 
 /* ==========================================================================
-   Powered by (Footer Branding)
+   Powered by (Footer Branding) – nur unten auf der Plugin-Seite
    ========================================================================== */
 
 .srm-powered-by {
@@ -505,54 +505,79 @@
     z-index: 9998;
     display: flex;
     justify-content: center;
-    padding: 10px 20px;
-    background: linear-gradient(to top, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.92));
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.96);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.srm-powered-by__box {
+    max-width: 420px;
+    padding: 14px 20px;
+    background: #fff;
+    border: 1px solid #e0a855;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.srm-powered-by__line {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #1d2327;
+}
+
+.srm-powered-by__line strong {
+    font-weight: 600;
+}
+
+.srm-powered-by__links {
+    margin: 0;
+    font-size: 13px;
 }
 
 .srm-powered-by__link {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    font-size: 12px;
-    line-height: 1.4;
-    color: #646970;
+    gap: 5px;
+    color: #2271b1;
     text-decoration: none;
-    border-radius: 20px;
-    transition: color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+    transition: color 0.15s ease, text-decoration 0.15s ease;
 }
 
 .srm-powered-by__link:hover {
-    color: #1d2327;
-    background: rgba(0, 0, 0, 0.04);
+    color: #135e96;
+    text-decoration: underline;
 }
 
 .srm-powered-by__link:focus {
-    color: #2271b1;
-    box-shadow: 0 0 0 1px #2271b1;
     outline: none;
+    box-shadow: 0 0 0 1px #2271b1;
+    border-radius: 2px;
 }
 
-.srm-powered-by__text {
+.srm-powered-by__sep {
+    margin: 0 6px;
+    color: #787c82;
     font-weight: 400;
-    letter-spacing: 0.02em;
 }
 
-.srm-powered-by__name {
-    font-weight: 600;
-    letter-spacing: 0.01em;
+.srm-powered-by__icon {
+    flex-shrink: 0;
 }
 
-/* Ensure visibility when admin has scrolled */
+.srm-powered-by__link--github .srm-powered-by__icon {
+    opacity: 0.9;
+}
+
 @media (max-width: 782px) {
     .srm-powered-by {
-        padding: 8px 12px;
+        padding: 10px 12px;
     }
-    .srm-powered-by__link {
-        font-size: 11px;
-        padding: 3px 10px;
+    .srm-powered-by__box {
+        padding: 12px 16px;
+    }
+    .srm-powered-by__line,
+    .srm-powered-by__links {
+        font-size: 12px;
     }
 }
