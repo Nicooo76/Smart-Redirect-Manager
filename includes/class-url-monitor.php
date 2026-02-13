@@ -58,9 +58,41 @@ class SRM_URL_Monitor {
 		add_action( 'pre_post_update', array( __CLASS__, 'store_old_permalink' ), 10, 2 );
 		add_action( 'post_updated', array( __CLASS__, 'check_permalink_change' ), 10, 3 );
 		add_action( 'wp_after_insert_post', array( __CLASS__, 'check_permalink_change_after_insert' ), 10, 3 );
+		add_action( 'rest_api_init', array( __CLASS__, 'register_rest_redirect_hooks' ) );
 		add_action( 'pre_edit_term', array( __CLASS__, 'store_old_term_link' ), 10, 2 );
 		add_action( 'edited_term', array( __CLASS__, 'check_term_link_change' ), 10, 3 );
 		add_action( 'admin_notices', array( __CLASS__, 'show_redirect_notice' ) );
+	}
+
+	/**
+	 * Register rest_after_insert_{post_type} for all monitored post types (CPTs + post/page).
+	 *
+	 * @return void
+	 */
+	public static function register_rest_redirect_hooks() {
+		$settings = wp_parse_args( get_option( 'srm_settings', array() ), self::$defaults );
+		$types    = isset( $settings['monitor_post_types'] ) ? (array) $settings['monitor_post_types'] : array();
+		foreach ( $types as $post_type ) {
+			if ( ! post_type_exists( $post_type ) ) {
+				continue;
+			}
+			add_action( 'rest_after_insert_' . $post_type, array( __CLASS__, 'on_rest_after_insert_post' ), 10, 3 );
+		}
+	}
+
+	/**
+	 * After REST insert/update: create redirect if URL changed (for CPTs and Block Editor).
+	 *
+	 * @param WP_Post $post     Inserted/updated post.
+	 * @param WP_REST_Request $request Request object.
+	 * @param bool    $creating True if creating, false if updating.
+	 * @return void
+	 */
+	public static function on_rest_after_insert_post( $post, $request, $creating ) {
+		if ( $creating || ! $post || ! isset( $post->ID ) ) {
+			return;
+		}
+		self::maybe_create_redirect_for_post( $post->ID );
 	}
 
 	/**
@@ -81,10 +113,11 @@ class SRM_URL_Monitor {
 	 * @return array Unchanged $data.
 	 */
 	public static function store_old_permalink_before_save( $data, $postarr ) {
-		if ( empty( $postarr['ID'] ) ) {
+		$post_id = isset( $postarr['ID'] ) ? (int) $postarr['ID'] : ( isset( $postarr['id'] ) ? (int) $postarr['id'] : 0 );
+		if ( $post_id <= 0 ) {
 			return $data;
 		}
-		self::store_old_permalink( (int) $postarr['ID'], $data );
+		self::store_old_permalink( $post_id, $data );
 		return $data;
 	}
 
@@ -98,18 +131,17 @@ class SRM_URL_Monitor {
 	public static function store_old_permalink( $post_id, $data ) {
 		$settings = self::get_settings();
 
-		// Skip if auto-redirect is disabled.
 		if ( empty( $settings['auto_redirect'] ) ) {
 			return;
 		}
 
+		// Zuerst Cache leeren, damit wir garantiert den aktuellen DB-Stand lesen (wichtig für CPTs/REST).
+		clean_post_cache( $post_id );
 		$post = get_post( $post_id );
 
 		if ( ! $post || 'publish' !== $post->post_status ) {
 			return;
 		}
-
-		// Skip revisions and autosaves.
 		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
 			return;
 		}
@@ -119,15 +151,12 @@ class SRM_URL_Monitor {
 			return;
 		}
 
-		// Cache leeren, damit get_permalink die alte URL aus der DB liest (nicht bereits
-		// aktualisierte Daten aus dem Objekt-Cache, z. B. bei REST/Block-Editor).
-		clean_post_cache( $post_id );
-		$post = get_post( $post_id );
-		if ( ! $post ) {
+		$old_url = get_permalink( $post_id );
+		if ( ! $old_url || is_wp_error( $old_url ) ) {
 			return;
 		}
-
-		self::$old_permalinks[ $post_id ] = get_permalink( $post_id );
+		self::$old_permalinks[ $post_id ] = $old_url;
+		set_transient( 'srm_old_permalink_' . $post_id, $old_url, 120 );
 	}
 
 	/**
@@ -164,17 +193,23 @@ class SRM_URL_Monitor {
 	 * @return void
 	 */
 	private static function maybe_create_redirect_for_post( $post_id ) {
-		if ( ! isset( self::$old_permalinks[ $post_id ] ) ) {
+		$old_permalink = null;
+		if ( isset( self::$old_permalinks[ $post_id ] ) ) {
+			$old_permalink = self::$old_permalinks[ $post_id ];
+			unset( self::$old_permalinks[ $post_id ] );
+		} else {
+			$old_permalink = get_transient( 'srm_old_permalink_' . $post_id );
+			if ( false !== $old_permalink ) {
+				delete_transient( 'srm_old_permalink_' . $post_id );
+			}
+		}
+		if ( empty( $old_permalink ) ) {
 			return;
 		}
 
-		$old_permalink = self::$old_permalinks[ $post_id ];
 		$new_permalink = get_permalink( $post_id );
-
 		$old_normalized = SRM_Database::normalize_url( $old_permalink );
 		$new_normalized = SRM_Database::normalize_url( $new_permalink );
-
-		unset( self::$old_permalinks[ $post_id ] );
 
 		if ( $old_normalized === $new_normalized ) {
 			return;
