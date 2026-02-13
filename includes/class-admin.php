@@ -237,16 +237,18 @@ class SRM_Admin {
             'target_url'  => isset( $_POST['target_url'] )  ? esc_url_raw( wp_unslash( $_POST['target_url'] ) )          : '',
             'status_code' => isset( $_POST['status_code'] )  ? absint( $_POST['status_code'] )                            : 301,
             'is_regex'    => isset( $_POST['is_regex'] )     ? (bool) $_POST['is_regex']                                  : false,
-            'is_active'   => isset( $_POST['is_active'] )    ? (bool) $_POST['is_active']                                 : true,
+            'is_active'   => isset( $_POST['is_active'] )    ? (bool) $_POST['is_active']                                 : false,
             'source_type' => isset( $_POST['source_type'] )  ? sanitize_text_field( wp_unslash( $_POST['source_type'] ) ) : 'manual',
             'group_id'    => isset( $_POST['group_id'] )     ? absint( $_POST['group_id'] )                               : 0,
             'notes'       => isset( $_POST['notes'] )        ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) )   : '',
             'expires_at'  => isset( $_POST['expires_at'] )   ? sanitize_text_field( wp_unslash( $_POST['expires_at'] ) )  : '',
         );
 
-        // Include ID for updates.
+        // Include ID for updates (form sends redirect_id).
         if ( ! empty( $_POST['id'] ) ) {
             $data['id'] = absint( $_POST['id'] );
+        } elseif ( ! empty( $_POST['redirect_id'] ) ) {
+            $data['id'] = absint( $_POST['redirect_id'] );
         }
 
         // Include conditions if provided.

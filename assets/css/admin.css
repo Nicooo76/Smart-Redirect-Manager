@@ -494,20 +494,15 @@
 }
 
 /* ==========================================================================
-   Powered by (Footer Branding) – nur unten auf der Plugin-Seite
+   Powered by (Footer Branding) – nur unten am Ende der Plugin-Seite
    ========================================================================== */
 
 .srm-powered-by {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 9998;
+    margin-top: 24px;
+    padding: 14px 20px;
     display: flex;
     justify-content: center;
-    padding: 14px 20px;
-    background: rgba(255, 255, 255, 0.96);
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    background: transparent;
 }
 
 .srm-powered-by__box {
@@ -533,6 +528,11 @@
 .srm-powered-by__links {
     margin: 0;
     font-size: 13px;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0;
+    line-height: 1.4;
 }
 
 .srm-powered-by__link {
@@ -559,6 +559,7 @@
     margin: 0 6px;
     color: #787c82;
     font-weight: 400;
+    flex-shrink: 0;
 }
 
 .srm-powered-by__icon {
