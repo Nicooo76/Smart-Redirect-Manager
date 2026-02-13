@@ -1,0 +1,489 @@
+/**
+ * Smart Redirect Manager - Admin Styles
+ *
+ * Modern, clean styles that integrate with the WordPress admin UI.
+ */
+
+/* ==========================================================================
+   General
+   ========================================================================== */
+
+.srm-card {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.srm-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.srm-card h2 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+/* ==========================================================================
+   Badges
+   ========================================================================== */
+
+.srm-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.srm-badge-green {
+    background: #d4edda;
+    color: #155724;
+}
+
+.srm-badge-yellow {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.srm-badge-red {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.srm-badge-blue {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.srm-badge-gray {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+/* ==========================================================================
+   Status Toggle
+   ========================================================================== */
+
+.srm-status-toggle {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-size: 18px;
+    padding: 4px 8px;
+}
+
+.srm-status-toggle:hover {
+    opacity: 0.7;
+}
+
+.srm-status-active {
+    color: #00a32a;
+}
+
+.srm-status-inactive {
+    color: #d63638;
+}
+
+/* ==========================================================================
+   Filter Bar
+   ========================================================================== */
+
+.srm-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #f6f7f7;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+}
+
+.srm-filter-bar input[type="search"] {
+    min-width: 200px;
+}
+
+.srm-filter-bar select {
+    min-width: 120px;
+}
+
+/* ==========================================================================
+   Info / Warning / Success Boxes
+   ========================================================================== */
+
+.srm-info-box {
+    background: #f0f6fc;
+    border-left: 4px solid #2271b1;
+    padding: 12px 16px;
+    margin: 10px 0;
+    border-radius: 0 4px 4px 0;
+}
+
+.srm-warning-box {
+    background: #fcf9e8;
+    border-left: 4px solid #dba617;
+    padding: 12px 16px;
+    margin: 10px 0;
+    border-radius: 0 4px 4px 0;
+}
+
+.srm-success-box {
+    background: #edfaef;
+    border-left: 4px solid #00a32a;
+    padding: 12px 16px;
+    margin: 10px 0;
+}
+
+/* ==========================================================================
+   Settings Descriptions
+   ========================================================================== */
+
+.srm-field-description {
+    color: #646970;
+    font-style: italic;
+    margin-top: 4px;
+    font-size: 13px;
+}
+
+.srm-setting-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+/* ==========================================================================
+   Code Badges for Status Codes
+   ========================================================================== */
+
+.srm-code-301 {
+    background: #d4edda;
+    color: #155724;
+}
+
+.srm-code-302,
+.srm-code-307 {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.srm-code-308 {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.srm-code-410 {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* ==========================================================================
+   Redirect Form
+   ========================================================================== */
+
+.srm-form-meta {
+    background: #f6f7f7;
+    border: 1px solid #c3c4c7;
+    padding: 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.srm-form-meta h3 {
+    margin-top: 0;
+}
+
+.srm-form-meta .srm-meta-item {
+    display: flex;
+    margin-bottom: 8px;
+}
+
+.srm-form-meta .srm-meta-label {
+    font-weight: 600;
+    min-width: 120px;
+    color: #1d2327;
+}
+
+.srm-form-meta .srm-meta-value {
+    color: #50575e;
+}
+
+/* ==========================================================================
+   Regex Tester
+   ========================================================================== */
+
+.srm-regex-tester {
+    background: #f6f7f7;
+    border: 1px solid #c3c4c7;
+    padding: 16px;
+    border-radius: 4px;
+    margin-top: 10px;
+    display: none;
+}
+
+.srm-regex-tester.visible {
+    display: block;
+}
+
+.srm-regex-result {
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.srm-regex-match {
+    background: #d4edda;
+    color: #155724;
+}
+
+.srm-regex-no-match {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* ==========================================================================
+   Conditions
+   ========================================================================== */
+
+.srm-condition-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 8px;
+    background: #f6f7f7;
+    border-radius: 4px;
+}
+
+.srm-condition-row select,
+.srm-condition-row input {
+    flex: 1;
+}
+
+.srm-condition-remove {
+    color: #d63638;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 16px;
+}
+
+/* ==========================================================================
+   Modal
+   ========================================================================== */
+
+.srm-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 100000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.srm-modal-overlay.active {
+    display: flex;
+}
+
+.srm-modal {
+    background: #fff;
+    border-radius: 8px;
+    padding: 24px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.srm-modal h2 {
+    margin-top: 0;
+}
+
+.srm-modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    justify-content: flex-end;
+}
+
+/* ==========================================================================
+   Tools Page Tabs
+   ========================================================================== */
+
+.srm-tab-content {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-top: none;
+    padding: 20px;
+}
+
+/* ==========================================================================
+   Server Rules Cards
+   ========================================================================== */
+
+.srm-server-rules {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.srm-server-rules textarea {
+    width: 100%;
+    min-height: 200px;
+    font-family: monospace;
+    font-size: 13px;
+    resize: vertical;
+}
+
+/* ==========================================================================
+   Groups
+   ========================================================================== */
+
+.srm-group-color {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+/* ==========================================================================
+   Chain Visualization
+   ========================================================================== */
+
+.srm-chain-step {
+    display: inline;
+    color: #50575e;
+}
+
+.srm-chain-arrow {
+    color: #2271b1;
+    font-weight: bold;
+    margin: 0 4px;
+}
+
+/* ==========================================================================
+   URL Validation Status Icons
+   ========================================================================== */
+
+.srm-status-ok {
+    color: #00a32a;
+    font-weight: bold;
+}
+
+.srm-status-warning {
+    color: #dba617;
+    font-weight: bold;
+}
+
+.srm-status-error {
+    color: #d63638;
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   Pagination
+   ========================================================================== */
+
+.srm-pagination {
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ==========================================================================
+   Summary Badges
+   ========================================================================== */
+
+.srm-summary {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.srm-summary-item {
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 782px) {
+    .srm-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .srm-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .srm-server-rules {
+        grid-template-columns: 1fr;
+    }
+
+    .srm-condition-row {
+        flex-wrap: wrap;
+    }
+}
+
+/* ==========================================================================
+   Table Enhancements
+   ========================================================================== */
+
+.wp-list-table .column-status {
+    width: 60px;
+    text-align: center;
+}
+
+.wp-list-table .column-code {
+    width: 60px;
+    text-align: center;
+}
+
+.wp-list-table .column-hits {
+    width: 70px;
+    text-align: right;
+}
+
+.wp-list-table .column-created {
+    width: 120px;
+}
+
+.wp-list-table .column-actions {
+    width: 120px;
+}
+
+.wp-list-table .column-cb {
+    width: 30px;
+}
+
+/* ==========================================================================
+   Truncated URLs
+   ========================================================================== */
+
+.srm-url-truncated {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+}
