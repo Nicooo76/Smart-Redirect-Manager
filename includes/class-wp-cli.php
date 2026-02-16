@@ -373,7 +373,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
             WP_CLI\Utils\format_items(
                 'table',
                 $overview['top_404'],
-                array( 'id', 'url', 'count' )
+                array( 'id', 'request_url', 'count' )
             );
         }
     }

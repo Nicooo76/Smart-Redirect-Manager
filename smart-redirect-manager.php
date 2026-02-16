@@ -3,7 +3,7 @@
  * Plugin Name: Smart Redirect Manager
  * Plugin URI:  https://gauditz.com
  * Description: Automatische URL-Überwachung mit Redirects, 404-Logging, Conditional Redirects, Hit-Tracking, WP-CLI und vielem mehr.
- * Version:     1.0.1
+ * Version:     1.0.3
  * Author:      Sven Gauditz
  * Author URI:  https://gauditz.com
  * License:     MIT
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('SRM_VERSION', '1.0.1'); // Bei jeder Änderung: Version hier und im Plugin-Header erhöhen.
+define('SRM_VERSION', '1.0.3'); // Bei jeder Änderung: Version hier und im Plugin-Header erhöhen.
 define('SRM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SRM_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('SRM_PLUGIN_FILE', __FILE__);

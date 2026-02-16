@@ -130,7 +130,7 @@ class SRM_Dashboard_Widget {
 			<ol>
 				<?php foreach ( array_slice( $top_404, 0, 3 ) as $entry ) : ?>
 					<li>
-						<code><?php echo esc_html( $entry->url ); ?></code>
+						<code><?php echo esc_html( isset( $entry->request_url ) ? $entry->request_url : '' ); ?></code>
 						(<?php echo esc_html( number_format_i18n( (int) $entry->count ) ); ?>)
 					</li>
 				<?php endforeach; ?>

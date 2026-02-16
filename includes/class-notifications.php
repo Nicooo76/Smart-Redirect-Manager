@@ -114,7 +114,7 @@ class SRM_Notifications {
 			$html .= '<tr><th style="text-align:left;">URL</th><th style="text-align:right;">Anzahl</th></tr>';
 
 			foreach ( array_slice( $top_404, 0, 5 ) as $entry ) {
-				$url   = isset( $entry->url ) ? $entry->url : ( isset( $entry->request_url ) ? $entry->request_url : '' );
+				$url   = isset( $entry->request_url ) ? $entry->request_url : ( isset( $entry->url ) ? $entry->url : '' );
 				$count = isset( $entry->count ) ? (int) $entry->count : 0;
 				$html .= '<tr>';
 				$html .= '<td>' . esc_html( $url ) . '</td>';

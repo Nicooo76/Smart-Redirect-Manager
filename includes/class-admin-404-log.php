@@ -30,12 +30,20 @@ class SRM_Admin_404_Log {
 	public static function render() {
 
 		// ---------------------------------------------------------------------
-		// 1. Read filter parameters from the query string.
+		// 1. Read filter and sort parameters from the query string.
 		// ---------------------------------------------------------------------
-		$search  = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
-		$status  = isset( $_GET['status'] ) ? sanitize_text_field( wp_unslash( $_GET['status'] ) ) : 'all';
-		$paged   = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
+		$search   = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+		$status   = isset( $_GET['status'] ) ? sanitize_text_field( wp_unslash( $_GET['status'] ) ) : 'all';
+		$paged    = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
 		$per_page = 25;
+		$orderby  = isset( $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : 'last_occurred';
+		$order    = isset( $_GET['order'] ) ? strtoupper( sanitize_text_field( wp_unslash( $_GET['order'] ) ) ) : 'DESC';
+
+		$allowed_orderby = array( 'request_url', 'referer', 'count', 'last_occurred', 'is_resolved' );
+		if ( ! in_array( $orderby, $allowed_orderby, true ) ) {
+			$orderby = 'last_occurred';
+		}
+		$order = ( $order === 'ASC' ) ? 'ASC' : 'DESC';
 
 		// ---------------------------------------------------------------------
 		// 2. Fetch log entries via SRM_404_Logger.
@@ -45,17 +53,48 @@ class SRM_Admin_404_Log {
 			'per_page' => $per_page,
 			'search'   => $search,
 			'status'   => $status,
+			'orderby'  => $orderby,
+			'order'    => $order,
 		) );
 
 		$items       = $result['items'];
 		$total_items = $result['total'];
 		$total_pages = ceil( $total_items / $per_page );
 
+		// Base URL for sort links (preserve filter and pagination).
+		$base_url = add_query_arg( array(
+			'page'   => 'srm-404-log',
+			's'      => $search,
+			'status' => $status,
+			'paged'  => $paged > 1 ? $paged : false,
+		), admin_url( 'admin.php' ) );
+		$base_url = remove_query_arg( 'orderby', $base_url );
+		$base_url = remove_query_arg( 'order', $base_url );
+
+		$sort_link = function( $column, $label ) use ( $base_url, $orderby, $order ) {
+			$next_order = ( $orderby === $column && $order === 'DESC' ) ? 'ASC' : 'DESC';
+			$url = add_query_arg( array( 'orderby' => $column, 'order' => $next_order ), $base_url );
+			$arrow = '';
+			if ( $orderby === $column ) {
+				$arrow = ( $order === 'ASC' ) ? ' &uarr;' : ' &darr;';
+			}
+			return '<a href="' . esc_url( $url ) . '" style="text-decoration:none;">' . esc_html( $label ) . $arrow . '</a>';
+		};
+
 		// ---------------------------------------------------------------------
-		// 3. Build pagination links.
+		// 3. Build pagination links (preserve sort and filters).
 		// ---------------------------------------------------------------------
+		$pagination_base = add_query_arg( array(
+			'page'    => 'srm-404-log',
+			's'       => $search,
+			'status'  => $status,
+			'orderby' => $orderby,
+			'order'   => $order,
+		), admin_url( 'admin.php' ) );
+		$pagination_base = add_query_arg( 'paged', '%#%', $pagination_base );
+
 		$pagination = paginate_links( array(
-			'base'      => add_query_arg( 'paged', '%#%' ),
+			'base'      => $pagination_base,
 			'format'    => '',
 			'prev_text' => '&laquo;',
 			'next_text' => '&raquo;',
@@ -75,6 +114,8 @@ class SRM_Admin_404_Log {
 			<!-- Filter bar -->
 			<form method="get" style="display: flex; align-items: center; gap: 8px; margin: 16px 0;">
 				<input type="hidden" name="page" value="srm-404-log" />
+				<input type="hidden" name="orderby" value="<?php echo esc_attr( $orderby ); ?>" />
+				<input type="hidden" name="order" value="<?php echo esc_attr( $order ); ?>" />
 
 				<input
 					type="search"
@@ -99,15 +140,15 @@ class SRM_Admin_404_Log {
 				>CSV Export</a>
 			</form>
 
-			<!-- Results table -->
+			<!-- Results table (sortable columns) -->
 			<table class="wp-list-table widefat fixed striped">
 				<thead>
 					<tr>
-						<th style="width: 30%;">URL</th>
-						<th style="width: 20%;">Referer</th>
-						<th style="width: 8%;">Aufrufe</th>
-						<th style="width: 14%;">Zuletzt</th>
-						<th style="width: 8%;">Status</th>
+						<th style="width: 30%;"><?php echo $sort_link( 'request_url', 'URL' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></th>
+						<th style="width: 20%;"><?php echo $sort_link( 'referer', 'Referer' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></th>
+						<th style="width: 8%;"><?php echo $sort_link( 'count', 'Aufrufe' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></th>
+						<th style="width: 14%;"><?php echo $sort_link( 'last_occurred', 'Zuletzt' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></th>
+						<th style="width: 8%;"><?php echo $sort_link( 'is_resolved', 'Status' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></th>
 						<th style="width: 20%;">Aktionen</th>
 					</tr>
 				</thead>

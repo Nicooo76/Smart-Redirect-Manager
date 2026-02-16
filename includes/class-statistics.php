@@ -130,9 +130,9 @@ class SRM_Statistics {
 			LIMIT 5"
 		);
 
-		// Top 5 unresolved 404 URLs by count.
+		// Top 5 unresolved 404 URLs by count (Spalte heißt request_url).
 		$top_404 = $wpdb->get_results(
-			"SELECT id, url, count
+			"SELECT id, request_url, count
 			FROM {$log_table}
 			WHERE is_resolved = 0
 			ORDER BY count DESC
